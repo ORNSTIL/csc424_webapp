@@ -17,7 +17,7 @@ export const Home = () => {
       });
 
       // If successful, set the token in the auth context
-      value.onLogin();
+      value.onLogin(response.data.token);
 
       // Reset the loginError state
       setLoginError(false);
