@@ -1,21 +1,36 @@
-import { useAuth } from "./context/AuthProvider";
 import React, { useState } from "react";
+import { useAuth } from "./context/AuthProvider";
+import axios from 'axios'; // Import Axios library
+
 export const Home = () => {
   const { value } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState(false);
+
   const handleLogin = async () => {
-    if (username === "bj" && password === "pass424") {
+    try {
+      // Make a POST request to the login API with user credentials
+      const response = await axios.post('http://localhost:8000/account/login', {
+        username,
+        password,
+      });
+
+      // If successful, set the token in the auth context
       value.onLogin();
-    } else {
+
+      // Reset the loginError state
+      setLoginError(false);
+    } catch (error) {
+      // If the login fails, set the loginError state to true
       setLoginError(true);
     }
   };
+
   return (
     <>
-      <h2>Home</h2>
-      {loginError && <p style={{ color: "red" }}>Error: invalid username or password entered</p>}
+      <h2>Login</h2>
+      {loginError && <p style={{ color: "red" }}>Failed login attempt</p>}
       <div>
         <label htmlFor="username">Username:</label>
         <input
