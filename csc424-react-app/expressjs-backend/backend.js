@@ -3,6 +3,7 @@ const app = express();
 const port = 8000;
 
 app.use(express.json());
+app.use(cors());
 
 // Sample user credentials for testing (you can replace this with a proper authentication mechanism)
 const sampleUser = {
