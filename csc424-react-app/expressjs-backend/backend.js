@@ -12,13 +12,16 @@ const sampleUser = {
   password: 'pass424',
 };
 
+const jwt = require('jsonwebtoken');
+const secretKey = 'csc424';
+
 app.post('/account/login', (req, res) => {
   const { username, password } = req.body;
 
   // Check if the provided username and password match the sampleUser credentials
   if (username === sampleUser.username && password === sampleUser.password) {
     // Generate a token (for simplicity, you can use a library like jsonwebtoken for a real-world scenario)
-    const token = 'your_generated_token_here';
+    const token = jwt.sign({ username }, secretKey);
 
     // Return the token in the response
     res.json({ token });
