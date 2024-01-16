@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./utils/ProtectedRoute";
 import { fakeAuth } from "./utils/FakeAuth";
 import { useAuth } from "./context/AuthProvider";
 import { AuthProvider } from "./context/AuthProvider";
+import { Register } from "./Register";
 export const AuthContext = React.createContext(null);  // we will use this in other components
 const App = () => {
   const [token, setToken] = React.useState(null);
@@ -21,6 +22,7 @@ const App = () => {
     const handleLogout = () => {
     setToken(null);
 };
+  <Navigation token={token} onLogout={handleLogout} />
 
 return (
 
@@ -40,6 +42,7 @@ return (
 		}
 		/>
       <Route path="home" element={<Home />} />
+	  <Route path="register" element={<Register />} />
       <Route path="*" element={<p>There's nothing here: 404!</p>} />
     </Routes>
   </AuthProvider>
