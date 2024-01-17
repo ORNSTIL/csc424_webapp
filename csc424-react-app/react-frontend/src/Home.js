@@ -9,20 +9,22 @@ export const Home = () => {
     const [password, setPassword] = useState("");
     const [loginError, setLoginError] = useState(false);
 	
-	const handleLogin = async () => {
+
+const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/account/login', {
-        username,
-        password,
-      });
+        const response = await axios.post('http://localhost:8000/account/login', {
+            username,
+            password,
+        });
 
-      value.onLogin(response.data.token);
+        value.onLogin(response.data.token);
 
-      setLoginError(false);
+        setLoginError(false);
     } catch (error) {
-      setLoginError(true);
+        setLoginError(true);
     }
-  };
+};
+
 
     return (
     <>
@@ -60,4 +62,6 @@ export const Home = () => {
 </>
 
 );
+
 };
+

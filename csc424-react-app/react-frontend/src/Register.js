@@ -1,4 +1,8 @@
+
+
 import { useAuth } from "./context/AuthProvider";
+import React, { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
@@ -6,24 +10,26 @@ export const Register = () => {
     const { value } = useAuth();
     const navigate = useNavigate();
 
-    const handleRegister = async () => {
-  try {
-    const registerUser = document.getElementById("registerUser").value;
-    const registerPass = document.getElementById("registerPass").value;
-    const registerValidatedPass = document.getElementById("registerValidatedPass").value;
+	const [registerUser, setRegisterUser] = useState("");
+	const [registerPass, setRegisterPass] = useState("");
+	const [registerValidatedPass, setRegisterValidatedPass] = useState("");
 
-    const response = await axios.post('http://localhost:8000/account/register', {
-      username: registerUser,
-      password: registerPass,
-      validatePassword: registerValidatedPass
-    });
 
-    navigate("/landing");
-  } catch (error) {
-    alert(error.response.data);
-    console.log(error);
-  }
+const handleRegister = async () => {
+    try {
+        const response = await axios.post('http://localhost:8000/account/register', {
+            username: registerUser,
+            password: registerPass,
+            validatePassword: registerValidatedPass
+        });
+        navigate("/landing");
+    } catch (error) {
+        alert(error.response.data);
+        console.log(error);
+    }
 };
+
+
 
 
     return (

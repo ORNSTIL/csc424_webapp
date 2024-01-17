@@ -4,6 +4,10 @@ const port = 8000;
 const cors = require('cors');
 const users = new Map();
 
+const { userServices } = require('./models/user-services.js');
+ 
+
+
 app.use(cors());
 app.use(express.json());
 
@@ -11,50 +15,48 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-app.get('/users', (req, res) => {
-    res.send(Array.from(users.keys()));
+
+app.get('/users', async (req, res) => {
+    const { name } = req.query;
+    try {
+        const usersList = await userServices.getUsersByName(name);
+        res.send({ users: usersList });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error occurred while fetching users");
+    }
 });
 
 
-app.post('/account/login', (req, res) => {
-    const fakeAuth = "2342f2f1d131rf12"
-    var username = req.body.username
-    var password = req.body.password
-	console.log(users.get(username))
-    if (users.get(username) != undefined && users.get(username) == password) {
-        res.send(fakeAuth)
-    }
-    else {
+
+app.post('/account/login', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const token = await userServices.login(username, password);
+        res.send({ token });
+    } catch (error) {
+        console.log(error);
+
         res.status(401).send("Failed Login");
     }
 });
 
-app.post('/account/register', (req, res) => {
+
+app.post('/account/register', async (req, res) => {
     const { username, password, validatePassword } = req.body;
-
-    if (username == "" || password == "" || validatePassword == "") {
-        res.status(403).send("Field has been left empty.");
-    }
-	
-	if (password != validatePassword) {
-        res.status(403).send("Your passwords must match.");
-    }
-	
-	if (! /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
-        res.status(403).send("Password not strong enough. Your password must meet these requirements:\n At least 8 characters\n At least one capital letter\n At least one number\n At least one special character");
-    }
-
-    if (users.get(username) != undefined) {
-        res.status(403).send("This username already exsits. Please enter a different username.");
-    }
-
-
-    else {
-        users.set(username, password);
-        res.status(201).send("User registered succesfully!");
+	console.log(username, password, validatePassword);
+    try {
+		
+        const newUser = await userServices.register(username, password, validatePassword);
+        res.status(201).send(`User registered successfully! ID: ${newUser._id}`);
+    } catch (error) {
+        console.log(error);
+        res.status(403).send(error.message);
     }
 });
 
+
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
-});   
+});
+
