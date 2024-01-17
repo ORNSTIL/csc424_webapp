@@ -1,21 +1,35 @@
-import { useAuth } from "./context/AuthProvider";
 import React, { useState } from "react";
+import { useAuth } from "./context/AuthProvider";
+import { NavLink } from "react-router-dom";
+import axios from 'axios';
+
 export const Home = () => {
-  const { value } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState(false);
-  const handleLogin = async () => {
-    if (username === "bj" && password === "pass424") {
-      value.onLogin();
-    } else {
-      setLoginError(true);
+    const { value } = useAuth();
+	const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loginError, setLoginError] = useState(false);
+	
+const handleLogin = async () => {
+    try {
+        const response = await axios.post('http://localhost:8000/account/login', {
+            username,
+            password,
+        });
+
+        value.onLogin(response.data.token);
+
+        setLoginError(false);
+    } catch (error) {
+        setLoginError(true);
     }
-  };
-  return (
+};
+
+
+    return (
     <>
-      <h2>Home</h2>
-      {loginError && <p style={{ color: "red" }}>Error: invalid username or password entered</p>}
+  <div>
+    <h2>Home (Public)</h2>
+	{loginError && <p style={{ color: "red" }}>Failed login attempt</p>}
       <div>
         <label htmlFor="username">Username:</label>
         <input
@@ -34,9 +48,17 @@ export const Home = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
+    <div>
       <button type="button" onClick={handleLogin}>
-        Log In
+        Sign In
       </button>
-    </>
-  );
+    </div>
+
+    <div>
+      <NavLink to="/register">New User? Register Here</NavLink>
+    </div>
+  </div>
+</>
+
+);
 };
