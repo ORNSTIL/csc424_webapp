@@ -1,12 +1,15 @@
 
+
 import { useAuth } from "./context/AuthProvider";
 import React, { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 export const Register = () => {
     const { value } = useAuth();
     const navigate = useNavigate();
+
 	const [registerUser, setRegisterUser] = useState("");
 	const [registerPass, setRegisterPass] = useState("");
 	const [registerValidatedPass, setRegisterValidatedPass] = useState("");
@@ -25,6 +28,7 @@ const handleRegister = async () => {
         console.log(error);
     }
 };
+
 
 
 

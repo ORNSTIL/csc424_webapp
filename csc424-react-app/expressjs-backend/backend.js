@@ -3,6 +3,7 @@ const app = express();
 const port = 8000;
 const cors = require('cors');
 const users = new Map();
+
 const { userServices } = require('./models/user-services.js');
  
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
+
 
 app.get('/users', async (req, res) => {
     const { name } = req.query;
@@ -34,9 +36,11 @@ app.post('/account/login', async (req, res) => {
         res.send({ token });
     } catch (error) {
         console.log(error);
+
         res.status(401).send("Failed Login");
     }
 });
+
 
 app.post('/account/register', async (req, res) => {
     const { username, password, validatePassword } = req.body;
@@ -55,3 +59,4 @@ app.post('/account/register', async (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
+
