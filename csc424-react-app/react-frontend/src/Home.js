@@ -1,67 +1,60 @@
-import React, { useState } from "react";
 import { useAuth } from "./context/AuthProvider";
-import { NavLink } from "react-router-dom";
-import axios from 'axios';
+import React,  { useState } from "react";
+import "./index.css";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
-    const { value } = useAuth();
-	const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [loginError, setLoginError] = useState(false);
-	
+  const { value } = useAuth();
+  const [username, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-const handleLogin = async () => {
-    try {
-        const response = await axios.post('http://localhost:8000/account/login', {
-            username,
-            password,
-        });
-
-        value.onLogin(response.data.token);
-
-        setLoginError(false);
-    } catch (error) {
-        setLoginError(true);
-    }
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   return value.onLogin(username, password);
+  // }
+  const handleSubmit = async () => {
+    value.username = username;
+    value.password = password;
+    value.onLogin();
 };
+  
+  function handleClick() {
+    navigate("/register");
+  }
 
-
-    return (
+  return (
     <>
-  <div>
-    <h2>Home (Public)</h2>
-	{loginError && <p style={{ color: "red" }}>Failed login attempt</p>}
-      <div>
-        <label htmlFor="username">Username:</label>
-        <input
-          type="text"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password:</label>
-        <input
+      <h2> Home (Public)</h2>
+
+      {value.errorMessage}
+
+      <form>
+          <p>Username</p>
+          <input 
+            type="text" 
+            name="name"
+            id="name"
+            value={username} onChange={(e)=>setName(e.target.value)}/>
+          <p>Password</p>
+          <input 
           type="password"
+          name="password"
           id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-    <div>
-      <button type="button" onClick={handleLogin}>
-        Sign In
-      </button>
-    </div>
+          value={password} onChange={(e)=>setPassword(e.target.value)}
+          />
+        </form>
+        <div>
+        <button type="submit" onClick={handleSubmit}>
+          Sign In
+        </button>
+        <button type="button" onClick={handleClick}>
+          Don't have an account?
+        </button>
+        </div>
 
-    <div>
-      <NavLink to="/register">New User? Register Here</NavLink>
-    </div>
-  </div>
-</>
-
-);
-
+    </>
+  );
 };
 
+export default Home;
