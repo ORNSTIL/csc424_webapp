@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const port = 8000;
 const cors = require('cors');
-const helmet = require('helmet');
+
 
 const userServices = require('./models/user-services');
 const jwtToken = require('./models/jwt-token');
@@ -15,7 +15,7 @@ const { body, validationResult } = require('express-validator');
 app.use(cors());
 app.use(express.json());
 
-app.use(helmet());
+
 
 app.post('/account/login', async (req, res) => {
 // app.post('/account/login', jwtToken.authenticateToken, async (req, res) => {
