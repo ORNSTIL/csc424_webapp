@@ -26,8 +26,7 @@ const App = () => {
       </div>
       <Routes>
         <Route index element={<Home />} />
-        {/* <Route index element={<Home onLogin={handleLogin}/>} />
-        <Route path="home" element={<Home onLogin={handleLogin} />} /> */}
+        {}
         <Route path="landing" element={
           <ProtectedRoute>
             <Landing />
@@ -41,9 +40,9 @@ const App = () => {
 };
 
 const Navigation = () => {
-// const Navigation = ({token, onLogout}) => {
+
   const { value } = useAuth();
-  // const { onLogout } = useAuth();
+
   return (
     <nav>
       <NavLink to="/home">Home</NavLink>
