@@ -1,6 +1,5 @@
 import { createContext, useContext, useState } from "react"; 
 import { useNavigate } from "react-router-dom";
-// import { fakeAuth } from "../utils/FakeAuth";
 import React from "react";
 import axios from 'axios';
 
@@ -24,7 +23,6 @@ export const AuthProvider = ({ children }) => {
 		console.log("still here");
 		//await new Promise(resolve => setTimeout(resolve, 0));
 		navigate('/landing');
-		
 
   };
 
@@ -43,7 +41,7 @@ export const AuthProvider = ({ children }) => {
         }
      }
      catch (error) {
-      // alert("Incorrect username or password.");
+
       alert(JSON.stringify(error.response.data.message))
      }
     };
@@ -59,7 +57,6 @@ export const AuthProvider = ({ children }) => {
     onLogin: handleLogin,
     onLogout: handleLogout,
     onRegister: handleRegister,
-    // errorMessage,
   };
 
 
