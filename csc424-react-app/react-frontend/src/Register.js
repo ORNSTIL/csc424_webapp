@@ -27,7 +27,8 @@ export const Register = () => {
             console.log(response);
             if(response.status === 201){
 				console.log("yo");
-                value.onRegister(response.data);
+                //value.onRegister(response.data);
+				value.onRegister(response.data);
 				//navigate("/landing");
             }
             else{
