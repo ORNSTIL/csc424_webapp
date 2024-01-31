@@ -1,104 +1,68 @@
-const { mongoose } = require('mongoose');
+const mongoose = require("mongoose");
 const userModel = require("./user");
-const { bcrypt } = require('bcrypt');
-const { jwt } = require('jsonwebtoken');
-
-
 mongoose.set("debug", true);
+mongoose.set('strictQuery',false);
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/users", {
+      .connect("mongodb://0.0.0.0:27017/users", {
+
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .catch((error) => console.log(error));
 
-async function getUsersByName(name) {
-  try {
-    const usersList = await userModel.find({ name: { $regex: new RegExp(name, "i") } });
-    return usersList;
-  } catch (error) {
-    console.log(error);
-    return [];
-  }
-}
 
-async function findUserById(id) {
-  try {
-    const user = await userModel.findById(id);
-    return user;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
+
+async function getAllUsers() {
+	console.log("in user sesrvices");
+    return await userModel.find();
 }
 
 async function addUser(user) {
-  try {
-    const newUser = new userModel(user);
-    const savedUser = await newUser.save();
-    return savedUser;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
+    try {
+      const userToAdd = new userModel(user);
+      const savedUser = await userToAdd.save();
+      return savedUser;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
 }
 
-async function login(username, password) {
-  try {
-    const user = await userModel.findOne({ username });
-    if (!user) {
-      throw new Error("User not found");
+
+async function findUserById(id) {
+    try {
+      return await userModel.findById(id);
+    } catch (error) {
+      console.log(error);
+      return undefined;
     }
-
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
-      throw new Error("Invalid password");
-    }
-
-    const token = jwt.sign({ username: user.username }, "your-secret-key");
-    user.token = token;
-    await user.save();
-
-    return token;
-  } catch (error) {
-    throw new Error(error.message);
-  }
 }
 
-async function register(username, password, validatePassword) {
-  try {
-    if (password !== validatePassword) {
-      throw new Error("Passwords do not match");
-    }
-
-    const existingUser = await userModel.findOne({ username });
-    if (existingUser) {
-      throw new Error("Username already exists");
-    }
-
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
-      throw new Error(
-        "Password not strong enough. Your password must meet these requirements:\n - At least 8 characters\n - At least one capital letter\n - At least one number\n - At least one special character"
-      );
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new userModel({ username, password: hashedPassword });
-    const savedUser = await newUser.save();
-
-    return savedUser;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+async function loginCheck(username, password) {
+    
+    return (await userModel.find({username: username, password: password}))[0] !==  undefined;
 }
 
-module.exports = {
-  addUser,
-  getUsersByName,
-  findUserById,
-  login,
-  
-};
+async function findUser(username, password) {
+    return await userModel.find({username: username, password: password});
+}
 
-exports.register = register;
+async function userExistsCheck(username){
+  return (await userModel.find({ username: username }))[0] !== undefined;
+}
+
+async function findUserByUsername(username) {
+    return await userModel.find({ username: username });
+
+}
+
+
+
+exports.findUserById = findUserById;
+exports.findUser = findUser;
+exports.findUserByUsername = findUserByUsername;
+exports.addUser = addUser;
+exports.getAllUsers = getAllUsers;
+exports.userExistsCheck = userExistsCheck;
+exports.loginCheck = loginCheck;
