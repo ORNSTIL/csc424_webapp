@@ -9,16 +9,15 @@ export const Home = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   return value.onLogin(username, password);
-  // }
+
+
   const handleSubmit = async () => {
     value.username = username;
     value.password = password;
     value.onLogin();
 };
-  
+
+
   function handleClick() {
     navigate("/register");
   }
@@ -49,7 +48,7 @@ export const Home = () => {
           Sign In
         </button>
         <button type="button" onClick={handleClick}>
-          Don't have an account?
+          New User? Register here!
         </button>
         </div>
 
