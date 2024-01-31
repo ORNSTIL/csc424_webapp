@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-/*const dotenv = require('dotenv');*/
+const dotenv = require('dotenv');
 
 
-/*dotenv.config();*/
+dotenv.config();
 
 function generateAccessToken(username) {
-    // return jwt.sign(username, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
-    return jwt.sign({username:username}, 'secretkey', { expiresIn: '2000s' });
+    return jwt.sign(username, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+
 }
 
 function authenticateToken(req, res, next) {
@@ -15,7 +15,7 @@ function authenticateToken(req, res, next) {
   
     if (token == null) return res.sendStatus(401)
   
-    jwt.verify(token, 'secretkey', (err, user) => {
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
       console.log(err)
   
       if (err) return res.sendStatus(403)
