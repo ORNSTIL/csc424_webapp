@@ -1,30 +1,49 @@
-import { useAuth } from "./context/AuthProvider.js";
 import React from "react";
-import axios from "axios";
-import { useState, useEffect } from "react";
 
-import Table from './Table.js';
-
-export const Landing = () => {
-  const { value } = useAuth();
-  const [tableUsers, setTableUsers] = useState([]);
-
-  useEffect(() => {
-    axios.get('https://localhost:8000/account/users'
-    ).then( response => {
-      if(response){
-        setTableUsers(response.data);
-      }
+function TableBody ({contacts}) {
+    const rows = contacts.map((row, i) => {
+        return (
+            <tr key = {i}>
+                <td>
+                    {row.name}
+                </td>
+                <td>
+                    {row.phoneNumber}
+                </td>
+            </tr>
+        );
     });
-  },[setTableUsers]);
+    return (
+        <tbody>
+            {rows}
+        </tbody>
+    );
+}
 
-  return (
-    <>
-      <h2>Landing (Protected)</h2>
-      <div> Authenticated as {value.token}</div>
-      <Table contacts={tableUsers} />
-    </>
-  );
-};
+function TableHeader() {
+return (
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Phone Number
+            </th>
+        </tr>
+    </thead>
+    );
+}
 
-export default Landing;
+
+
+function Table({contacts}) {
+    return (
+        <table>
+            <TableHeader />
+            <TableBody contacts={contacts} />
+        </table>
+    );
+}
+
+export default Table;
