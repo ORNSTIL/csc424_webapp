@@ -1,66 +1,67 @@
-import { Routes, Route, Link, NavLink } from "react-router-dom";
-import React, { useState } from "react";
-import { Home } from "./Home";
+import { Routes, Route, NavLink } from "react-router-dom";
 import { Landing } from "./Landing";
+import { Home } from "./Home";
+// import React, { useState } from "react";
 import { ProtectedRoute } from "./utils/ProtectedRoute";
-import { fakeAuth } from "./utils/FakeAuth";
+// import { fakeAuth } from "./utils/FakeAuth";
+// import { NavLink } from "react-router-dom";
 import { useAuth } from "./context/AuthProvider";
 import { AuthProvider } from "./context/AuthProvider";
 import { Register } from "./Register";
-export const AuthContext = React.createContext(null);  // we will use this in other components
+// import axios from 'axios';
+
+import React from "react";
+
+
+export const AuthContext = React.createContext(null);
+
 const App = () => {
-  const [token, setToken] = React.useState(null);
-  const [user, setUser] = React.useState(null);
+  
 
-  const handleLogin = async () => {
-
-    const token = await fakeAuth();
-    setToken(token);
-
-};
-
-    const handleLogout = () => {
-    setToken(null);
-};
-  <Navigation token={token} onLogout={handleLogout} />
-
-return (
-
-<AuthProvider>
-    <Navigation />
-   
-    <h1>React Router</h1>
-
-    <Routes>
-      <Route index element={<Home />} />
-      <Route
-		path="landing"
-		element={
-			<ProtectedRoute>
-				<Landing />
-			</ProtectedRoute>
-		}
-		/>
-      <Route path="home" element={<Home />} />
-	  <Route path="register" element={<Register />} />
-      <Route path="*" element={<p>There's nothing here: 404!</p>} />
-    </Routes>
-  </AuthProvider>
-);
+  return (
+    <AuthProvider>
+      <Navigation />
+      <div className="center">
+        <h1>React Router</h1>
+      </div>
+      <Routes>
+        <Route index element={<Home />} />
+        {}
+        <Route path="landing" element={
+          <ProtectedRoute>
+            <Landing />
+          </ProtectedRoute>} />
+        <Route path="home" element={<Home />} />
+        <Route path="register" element={<Register />} />
+        <Route path="*" element={<p>There's nothing here: 404!</p>} />
+      </Routes>
+    </AuthProvider>
+  );
 };
 
 const Navigation = () => {
+
   const { value } = useAuth();
+
   return (
     <nav>
       <NavLink to="/home">Home</NavLink>
       <NavLink to="/landing">Landing</NavLink>
+      <NavLink to="/register">Register</NavLink>
+
+      {/* {value.token && ( */}
       {value.token && (
+
         <button type="button" onClick={value.onLogout}>
+        {/* <button type="button" onClick={onLogout}> */}
+
           Sign Out
-   </button>
-)}
-  </nav>
-);
+      </button>
+      )}
+    </nav>
+  );
 }
+
+
+
 export default App;
