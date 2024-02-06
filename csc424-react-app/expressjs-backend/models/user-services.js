@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
 const userModel = require("./user");
+const dotenv = require("dotenv");
 mongoose.set("debug", true);
 mongoose.set('strictQuery',false);
+dotenv.config();
 
 mongoose
-      .connect("mongodb://0.0.0.0:27017/users", {
+      .connect(process.env.MONGO.URI, {
 
     useNewUrlParser: true,
     useUnifiedTopology: true,
