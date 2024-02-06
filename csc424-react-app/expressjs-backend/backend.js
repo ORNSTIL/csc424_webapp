@@ -1,4 +1,5 @@
 const express = require('express');
+const sanitizeHtml = require('sanitize-html');
 const app = express();
 const port = 8000;
 const cors = require('cors');
@@ -54,8 +55,11 @@ app.post('/account/login', async (req, res) => {
 
 
     try{
-        const username = req.body.value.username;
-        const password = req.body.value.password;
+        const username = sanitizeHtml(req.body.value.username);
+        const password = sanitizeHtml(req.body.value.password);
+        if (typeof username !== 'string' || typeof password !== 'string') {
+            return res.status(400).send("Invalid data types");
+        }
 
         const user = await userServices.loginCheck(username, password);
         if(user){
@@ -74,11 +78,14 @@ app.post('/account/login', async (req, res) => {
 });
 
 app.post('/account/register', async (req, res) => {
-    const User = req.body.user;
+    const User = sanitizeHtml(req.body.user);
 
-    const Username = req.body.user.username;
+    const Username = sanitizeHtml(req.body.user.username);
 
-    const Password = req.body.user.password;
+    const Password = sanitizeHtml(req.body.user.password);
+    if (typeof Username !== 'string' || typeof Password !== 'string') {
+        return res.status(400).send("Invalid data types");
+    }
 
     if(!containsUppercase(Password)){
         res.status(400).json({message: 'Passwords require an uppercase letter'});
@@ -97,7 +104,7 @@ app.post('/account/register', async (req, res) => {
         else{
             let Token = jwtToken.generateAccessToken({ Username });
             const newUser = await userServices.addUser(User);
-            res.status(201).send(Token);
+            res.status(201).send(sanitizeHtml(Token));
         }
     }
 });
