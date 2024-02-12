@@ -1,49 +1,40 @@
-import React from "react";
-
-function TableBody ({contacts}) {
-    const rows = contacts.map((row, i) => {
-        return (
-            <tr key = {i}>
-                <td>
-                    {row.name}
-                </td>
-                <td>
-                    {row.phoneNumber}
-                </td>
-            </tr>
-        );
-    });
+function TableHeader() {
+    return (
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Phone #</th>
+        </tr>
+      </thead>
+    );
+  }
+  
+  function TableBody(props) {
+    const rows = props.characterData?.map((row, index) => {
+      return (
+        <tr key={index}>
+          <td>{row.username}</td>
+          <td>{row.phone}</td>
+        </tr>
+      );
+     }
+    );
     return (
         <tbody>
-            {rows}
-        </tbody>
-    );
-}
-
-function TableHeader() {
-return (
-    <thead>
-        <tr>
-            <th>
-                Name
-            </th>
-            <th>
-                Phone Number
-            </th>
-        </tr>
-    </thead>
-    );
-}
-
-
-
-function Table({contacts}) {
-    return (
+          {rows}
+         </tbody>
+     );
+  }
+  
+  function Table(props) {
+      return (
         <table>
-            <TableHeader />
-            <TableBody contacts={contacts} />
+          <TableHeader />
+          <TableBody characterData={props.characterData} 
+            removeCharacter={props.removeCharacter} />
         </table>
-    );
-}
-
-export default Table;
+      );
+  }
+  
+  export default Table;
+  
