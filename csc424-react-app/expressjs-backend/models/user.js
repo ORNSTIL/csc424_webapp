@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema(
   {
@@ -7,23 +7,28 @@ const UserSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-
     password: {
-        type: String,
-        required: true,
-        trim: true,
+      type: String,
+      required: true,
+      trim: true,
+      validate(value) {
+        if (value.length < 2)
+          throw new Error("Invalid password, must be at least 2 characters.");
+      },
     },
-    
-    phoneNumber: {
+    phone: {
       type: String,
       required: true,
       trim: true,
     },
-
+    token: {
+      type: String,
+      required: true,
+      trim: true,
+    }
   },
-  { collection: "users_list" }
+  { collection: "users_list" },
 );
 
 const User = mongoose.model("User", UserSchema);
-
 module.exports = User;
