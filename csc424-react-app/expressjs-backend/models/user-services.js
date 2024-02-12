@@ -1,68 +1,78 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const userModel = require("./user");
+const dotenv = require('dotenv');
+const sanitizeHtml = require('sanitize-html');
+dotenv.config();
+
 mongoose.set("debug", true);
-mongoose.set('strictQuery',false);
-
-mongoose
-      .connect("mongodb://0.0.0.0:27017/users", {
-
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .catch((error) => console.log(error));
 
 
-
-async function getAllUsers() {
-	console.log("in user sesrvices");
-    return await userModel.find();
-}
+mongoose.connect(
+    "" + process.env.MONGO_URI
+).catch((error) => console.log(error));
 
 async function addUser(user) {
-    try {
+  try {
+    if (await findUserByUsername(user.username)){;
       const userToAdd = new userModel(user);
       const savedUser = await userToAdd.save();
       return savedUser;
-    } catch (error) {
-      console.log(error);
+    } else {
+      return false
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+function getUsers(username, phone) {
+    let promise;
+    if (username) {
+      promise = findUserByUsername(username);
+    } else if (phone) {
+      promise = findUserByPhone(phone);
+    } else {
+      promise = userModel.find();
+    }
+    return promise;
+  }
+
+async function updateUser(user) {
+  try {
+    if (await findUserByUsername(user.username)){
+      const updateDoc = {
+        $set: {
+          token: `${user.token}`
+        }
+      };
+      const result = await userModel.updateOne({username: user.username}, updateDoc);
+      return result;
+    } else {
       return false;
     }
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+function findUserByUsername(username) {
+  return userModel.find({ username: username });
+}
+
+function findUserByPhone(phone) {
+    return userModel.find({ phone: phone });
+}
+
+function findUserByToken(token) {
+  return userModel.find({ token: token });
 }
 
 
-async function findUserById(id) {
-    try {
-      return await userModel.findById(id);
-    } catch (error) {
-      console.log(error);
-      return undefined;
-    }
-}
-
-async function loginCheck(username, password) {
-    
-    return (await userModel.find({username: username, password: password}))[0] !==  undefined;
-}
-
-async function findUser(username, password) {
-    return await userModel.find({username: username, password: password});
-}
-
-async function userExistsCheck(username){
-  return (await userModel.find({ username: username }))[0] !== undefined;
-}
-
-async function findUserByUsername(username) {
-    return await userModel.find({ username: username });
-
-}
-
-
-
-exports.findUserById = findUserById;
-exports.findUser = findUser;
+exports.getUsers = getUsers;
 exports.findUserByUsername = findUserByUsername;
+exports.findUserByToken = findUserByToken;
+exports.findUserByPhone = findUserByPhone;
 exports.addUser = addUser;
-exports.getAllUsers = getAllUsers;
-exports.userExistsCheck = userExistsCheck;
-exports.loginCheck = loginCheck;
+exports.updateUser = updateUser;
