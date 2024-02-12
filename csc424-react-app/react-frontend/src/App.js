@@ -1,67 +1,24 @@
-import { Routes, Route, NavLink } from "react-router-dom";
-import { Landing } from "./Landing";
-import { Home } from "./Home";
-// import React, { useState } from "react";
-import { ProtectedRoute } from "./utils/ProtectedRoute";
-// import { fakeAuth } from "./utils/FakeAuth";
-// import { NavLink } from "react-router-dom";
-import { useAuth } from "./context/AuthProvider";
-import { AuthProvider } from "./context/AuthProvider";
-import { Register } from "./Register";
-// import axios from 'axios';
-
 import React from "react";
-
-
-export const AuthContext = React.createContext(null);
+import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthProvider";
+import Navigation from "./Navigation";
+import Home from "./Home";
+import Landing from "./Landing";
+import Register from "./Register";
 
 const App = () => {
-  
-
   return (
     <AuthProvider>
       <Navigation />
-      <div className="center">
-        <h1>React Router</h1>
-      </div>
+      <h1>React Router</h1>
       <Routes>
         <Route index element={<Home />} />
-        {}
-        <Route path="landing" element={
-          <ProtectedRoute>
-            <Landing />
-          </ProtectedRoute>} />
+        <Route path="landing" element={<Landing />} />
         <Route path="home" element={<Home />} />
         <Route path="register" element={<Register />} />
-        <Route path="*" element={<p>There's nothing here: 404!</p>} />
       </Routes>
     </AuthProvider>
   );
 };
-
-const Navigation = () => {
-
-  const { value } = useAuth();
-
-  return (
-    <nav>
-      <NavLink to="/home">Home</NavLink>
-      <NavLink to="/landing">Landing</NavLink>
-      <NavLink to="/register">Register</NavLink>
-
-      {/* {value.token && ( */}
-      {value.token && (
-
-        <button type="button" onClick={value.onLogout}>
-        {/* <button type="button" onClick={onLogout}> */}
-
-          Sign Out
-      </button>
-      )}
-    </nav>
-  );
-}
-
-
 
 export default App;
