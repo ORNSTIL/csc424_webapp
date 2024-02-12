@@ -1,64 +1,61 @@
-import { createContext, useContext, useState } from "react"; 
+import { createContext, useContext, useState, useEffect  } from "react";
 import { useNavigate } from "react-router-dom";
-import React from "react";
-import axios from 'axios';
+import {checkToken} from "../apihelper.js";
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-    const navigate = useNavigate();
-    const [token, setToken] = useState('');
+  const navigate = useNavigate();
 
+  const [token, setToken] = useState(null);
 
+  async function validateCookie() {
+    try {
+        const token = document.cookie && document.cookie.split("=")[1];
+        if (token) {
+          checkToken(token)
+          .then((res) => res.json())
+          .then((json) => {
+            const user = json[0];
+            value.username = user.username;
+            value.password = user.password;
+            value.onLogin(user.token);
+          })
+          .catch(() => {  
+              return false;
+          });
+        } else {
+          return false;
+        }
+    } catch (error) {
+        return false;
+    }
+  } 
 
-  const handleRegister = async (token) => {
-
-		console.log("here");
-
-        setToken(token);
-
-        // document.cookie = `token=${response.data.token}`;
-        document.cookie = `token=${token}`;
-		console.log(document.cookie);
-		console.log("still here");
-		//await new Promise(resolve => setTimeout(resolve, 0));
-		navigate('/landing');
-
+  const handleLogin = async (token) => {
+    document.cookie = `token=${token}`;
+    setToken(token);
   };
 
-    const handleLogin = async () => {
-      try {
-        const response = await axios.post('https://localhost:8000/account/login', {value});
-        console.log(response);
-        if(response.status === 201){
-          setToken(response.data.token);
-          
-          //document.cookie = `token=${token}`;
-          document.cookie = `token=${response.data.token}`;
-		  console.log(document.cookie);
-
-          navigate('/landing');
-        }
-     }
-     catch (error) {
-
-      alert(JSON.stringify(error.response.data.message))
-     }
-    };
-
   const handleLogout = () => {
+    document.cookie = `token=${null}`;
     setToken(null);
-    document.cookie = `token=;max-age=300`
+    navigate("/");
   };
 
   const value = {
     token,
     setToken: setToken,
+    username: "",
+    password: "",
+    phone: "",
     onLogin: handleLogin,
     onLogout: handleLogout,
-    onRegister: handleRegister,
   };
 
+  useEffect(() => {
+    validateCookie()
+  }, [] );
 
   return (
     <AuthContext.Provider value={{ value }}>
@@ -67,5 +64,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// give callers access to the context
 export const useAuth = () => useContext(AuthContext);
