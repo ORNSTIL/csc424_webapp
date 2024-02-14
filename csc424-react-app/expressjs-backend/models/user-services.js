@@ -1,104 +1,78 @@
-const { mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 const userModel = require("./user");
-const { bcrypt } = require('bcrypt');
-const { jwt } = require('jsonwebtoken');
-
+const dotenv = require('dotenv');
+const sanitizeHtml = require('sanitize-html');
+dotenv.config();
 
 mongoose.set("debug", true);
 
-mongoose
-  .connect("mongodb://127.0.0.1:27017/users", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .catch((error) => console.log(error));
 
-async function getUsersByName(name) {
-  try {
-    const usersList = await userModel.find({ name: { $regex: new RegExp(name, "i") } });
-    return usersList;
-  } catch (error) {
-    console.log(error);
-    return [];
-  }
-}
-
-async function findUserById(id) {
-  try {
-    const user = await userModel.findById(id);
-    return user;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
+mongoose.connect(
+    "" + process.env.MONGO_URI
+).catch((error) => console.log(error));
 
 async function addUser(user) {
   try {
-    const newUser = new userModel(user);
-    const savedUser = await newUser.save();
-    return savedUser;
+    if (await findUserByUsername(user.username)){;
+      const userToAdd = new userModel(user);
+      const savedUser = await userToAdd.save();
+      return savedUser;
+    } else {
+      return false
+    }
   } catch (error) {
     console.log(error);
-    return null;
+    return false;
   }
 }
 
-async function login(username, password) {
+function getUsers(username, phone) {
+    let promise;
+    if (username) {
+      promise = findUserByUsername(username);
+    } else if (phone) {
+      promise = findUserByPhone(phone);
+    } else {
+      promise = userModel.find();
+    }
+    return promise;
+  }
+
+async function updateUser(user) {
   try {
-    const user = await userModel.findOne({ username });
-    if (!user) {
-      throw new Error("User not found");
+    if (await findUserByUsername(user.username)){
+      const updateDoc = {
+        $set: {
+          token: `${user.token}`
+        }
+      };
+      const result = await userModel.updateOne({username: user.username}, updateDoc);
+      return result;
+    } else {
+      return false;
     }
-
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (!isPasswordMatch) {
-      throw new Error("Invalid password");
-    }
-
-    const token = jwt.sign({ username: user.username }, "your-secret-key");
-    user.token = token;
-    await user.save();
-
-    return token;
   } catch (error) {
-    throw new Error(error.message);
+    console.log(error);
+    return false;
   }
 }
 
-async function register(username, password, validatePassword) {
-  try {
-    if (password !== validatePassword) {
-      throw new Error("Passwords do not match");
-    }
-
-    const existingUser = await userModel.findOne({ username });
-    if (existingUser) {
-      throw new Error("Username already exists");
-    }
-
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
-      throw new Error(
-        "Password not strong enough. Your password must meet these requirements:\n - At least 8 characters\n - At least one capital letter\n - At least one number\n - At least one special character"
-      );
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new userModel({ username, password: hashedPassword });
-    const savedUser = await newUser.save();
-
-    return savedUser;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+function findUserByUsername(username) {
+  return userModel.find({ username: username });
 }
 
-module.exports = {
-  addUser,
-  getUsersByName,
-  findUserById,
-  login,
-  
-};
+function findUserByPhone(phone) {
+    return userModel.find({ phone: phone });
+}
 
-exports.register = register;
+function findUserByToken(token) {
+  return userModel.find({ token: token });
+}
+
+
+exports.getUsers = getUsers;
+exports.findUserByUsername = findUserByUsername;
+exports.findUserByToken = findUserByToken;
+exports.findUserByPhone = findUserByPhone;
+exports.addUser = addUser;
+exports.updateUser = updateUser;

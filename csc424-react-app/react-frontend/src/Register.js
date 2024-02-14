@@ -1,63 +1,51 @@
-
-
-import { useAuth } from "./context/AuthProvider";
 import React, { useState } from "react";
-
+import { useAuth } from "./context/AuthProvider";
+import { HandleRegistrationAttempt } from "./apihelper";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
 
-export const Register = () => {
-    const { value } = useAuth();
-    const navigate = useNavigate();
+const Register = () => {
+  const { value } = useAuth();
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+  const [phone, setPhone] = useState("");
 
-	const [registerUser, setRegisterUser] = useState("");
-	const [registerPass, setRegisterPass] = useState("");
-	const [registerValidatedPass, setRegisterValidatedPass] = useState("");
-
-
-const handleRegister = async () => {
-    try {
-        const response = await axios.post('http://localhost:8000/account/register', {
-            username: registerUser,
-            password: registerPass,
-            validatePassword: registerValidatedPass
-        });
+  const handleSubmit = () => {
+    value.username = username;
+    value.password = password;
+    value.phone = phone;
+    HandleRegistrationAttempt({ username: value.username, password: value.password, password2: password2, phone: value.phone })
+      .then((res) => res.json())
+      .then((res) => {
+        value.onLogin(res.token);
         navigate("/landing");
-    } catch (error) {
-        alert(error.response.data);
-        console.log(error);
-    }
-};
+      })
+      .catch((exception) => console.log(exception));
+  };
 
-
-
-
-    return (
-    <>	
-	  <div>
-    <h2>Register (Public)</h2>
-
-    <div>
-      <label htmlFor="Username">Username:</label>
-      <input type="text" id="registerUser" />
-    </div>
-
-    <div>
-      <label htmlFor="Password1">Password:</label>
-      <input type="password" id="registerPass" />
-    </div>
-
-	 <div>
-      <label htmlFor="Password2">Confirm Password:</label>
-      <input type="password" id="registerValidatedPass" />
-    </div>
-	
-    <div>
-      <button type="button" onClick={handleRegister}>
-        Register
-      </button>
-    </div>
-  </div>
+  return (
+    <>
+      <h2>Register (Public)</h2>
+      <form>
+        <label>
+          <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        </label>
+        <label>
+          <input type="text" placeholder="Phone #" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        </label>
+        <label>
+          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </label>
+        <label>
+          <input type="password" placeholder="Confirm Password" value={password2} onChange={(e) => setPassword2(e.target.value)} />
+        </label>
+        <button type="button" onClick={handleSubmit}>
+          Sign Up
+        </button>
+      </form>
     </>
-);
+  );
 };
+
+export default Register;
